@@ -1,0 +1,434 @@
+<!-- ▼▼▼ 여기부터 복사 시작 ▼▼▼ -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="체크리스트">
+<title>체크리스트</title>
+<style>
+:root {
+--bg-color: #ffffff;
+--card-bg: #f2f2f7;
+--input-bg: #f2f2f7;
+--text-main: #111111;
+--text-sub: #777777;
+--text-done: #a0a0a5;
+--border-circle: #b0b0b5;
+--check-fill: #222222;
+--check-mark: #ffffff;
+--handle-color: #999999;
+--btn-bg: #e5e5ea;
+--btn-text: #111111;
+}
+
+@media (prefers-color-scheme: dark) {
+:root {
+--bg-color: #000000;
+--card-bg: #1c1c1e;
+--input-bg: #1c1c1e;
+--text-main: #f2f2f7;
+--text-sub: #8e8e93;
+--text-done: #545458;
+--border-circle: #636366;
+--check-fill: #e5e5ea;
+--check-mark: #000000;
+--handle-color: #636366;
+--btn-bg: #2c2c2e;
+--btn-text: #f2f2f7;
+}
+}
+
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", sans-serif;
+-webkit-tap-highlight-color: transparent;
+}
+
+body {
+background-color: var(--bg-color);
+color: var(--text-main);
+padding: env(safe-area-inset-top, 20px) 16px 80px;
+display: flex;
+justify-content: center;
+transition: background-color 0.2s, color 0.2s;
+}
+
+.container {
+width: 100%;
+max-width: 540px;
+padding-top: 16px;
+}
+
+.top-bar {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 26px;
+}
+
+.app-title {
+font-size: 1.35rem;
+font-weight: 700;
+letter-spacing: -0.02em;
+}
+
+.clear-done-btn {
+background-color: var(--btn-bg);
+color: var(--btn-text);
+border: none;
+padding: 7px 12px;
+border-radius: 8px;
+font-size: 0.82rem;
+font-weight: 500;
+cursor: pointer;
+}
+
+.clear-done-btn:active {
+opacity: 0.7;
+}
+
+.section-block {
+margin-bottom: 28px;
+}
+
+.section-header {
+margin-bottom: 8px;
+padding: 0 4px;
+}
+
+.section-title {
+font-size: 1.05rem;
+font-weight: 700;
+color: var(--text-main);
+}
+
+.add-task-box {
+display: flex;
+gap: 8px;
+margin-bottom: 12px;
+}
+
+.add-task-box input {
+flex: 1;
+background-color: var(--input-bg);
+color: var(--text-main);
+border: none;
+padding: 10px 14px;
+border-radius: 12px;
+font-size: 15px;
+outline: none;
+}
+
+.add-task-box input::placeholder {
+color: var(--text-sub);
+}
+
+.add-task-box button {
+background-color: var(--btn-bg);
+color: var(--btn-text);
+border: none;
+padding: 0 14px;
+border-radius: 12px;
+font-size: 0.85rem;
+font-weight: 600;
+cursor: pointer;
+white-space: nowrap;
+}
+
+.add-task-box button:active {
+opacity: 0.7;
+}
+
+.task-list {
+list-style: none;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.task-card {
+background-color: var(--card-bg);
+border-radius: 14px;
+padding: 14px 16px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+transition: transform 0.15s ease, opacity 0.15s ease;
+user-select: none;
+}
+
+.task-card.dragging {
+opacity: 0.55;
+transform: scale(0.98);
+}
+
+.task-left {
+display: flex;
+align-items: center;
+gap: 14px;
+flex: 1;
+cursor: pointer;
+}
+
+.circle-checkbox {
+appearance: none;
+-webkit-appearance: none;
+width: 24px;
+height: 24px;
+border: 1.8px solid var(--border-circle);
+border-radius: 50%;
+background: transparent;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+transition: all 0.2s;
+}
+
+.circle-checkbox:checked {
+background-color: var(--check-fill);
+border-color: var(--check-fill);
+}
+
+.circle-checkbox:checked::after {
+content: "";
+width: 5px;
+height: 10px;
+border: solid var(--check-mark);
+border-width: 0 2px 2px 0;
+transform: rotate(45deg);
+margin-bottom: 2px;
+}
+
+.task-text {
+font-size: 1rem;
+color: var(--text-main);
+line-height: 1.4;
+word-break: break-word;
+transition: color 0.2s;
+}
+
+.task-card.done .task-text {
+color: var(--text-done);
+text-decoration: line-through;
+}
+
+.drag-handle {
+width: 24px;
+height: 24px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 4px;
+cursor: grab;
+touch-action: none;
+flex-shrink: 0;
+padding: 4px;
+}
+
+.drag-handle span {
+display: block;
+width: 16px;
+height: 1.8px;
+background-color: var(--handle-color);
+border-radius: 1px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="top-bar">
+<div class="app-title">체크리스트</div>
+<button class="clear-done-btn" onclick="clearAllDone()">한 일 모두 지우기</button>
+</div>
+
+<div id="categoryList"></div>
+</div>
+
+<script>
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+const FIXED_CATEGORIES = [
+{ id: 'today', name: '오늘 할 일' },
+{ id: 'important', name: '중요한 일' },
+{ id: 'performance', name: '수행평가' },
+{ id: 'korean', name: '국어' },
+{ id: 'english', name: '영어' },
+{ id: 'math', name: '수학' },
+{ id: 'science', name: '과학' },
+{ id: 'social', name: '사회' },
+{ id: 'history', name: '한국사' }
+];
+
+let tasksByCategory = JSON.parse(localStorage.getItem('fixedSubjectChecklist')) || {};
+
+FIXED_CATEGORIES.forEach(cat => {
+if (!Array.isArray(tasksByCategory[cat.id])) {
+tasksByCategory[cat.id] = [];
+}
+});
+
+function cleanExpiredTasks() {
+const now = Date.now();
+let changed = false;
+
+FIXED_CATEGORIES.forEach(cat => {
+const beforeLen = tasksByCategory[cat.id].length;
+tasksByCategory[cat.id] = tasksByCategory[cat.id].filter(task => {
+if (task.done && task.doneAt && (now - task.doneAt >= ONE_DAY_MS)) {
+return false;
+}
+return true;
+});
+if (tasksByCategory[cat.id].length !== beforeLen) {
+changed = true;
+}
+});
+
+if (changed) saveData();
+}
+
+function saveData() {
+localStorage.setItem('fixedSubjectChecklist', JSON.stringify(tasksByCategory));
+}
+
+function addTask(catId) {
+const input = document.getElementById(`taskInput-${catId}`);
+const text = input.value.trim();
+if (!text) return;
+
+tasksByCategory[catId].push({
+id: Date.now(),
+text: text,
+done: false,
+doneAt: null
+});
+
+input.value = '';
+saveData();
+render();
+}
+
+function toggleTask(catId, taskId) {
+const task = tasksByCategory[catId].find(t => t.id === taskId);
+if (task) {
+task.done = !task.done;
+task.doneAt = task.done ? Date.now() : null;
+}
+saveData();
+render();
+}
+
+function clearAllDone() {
+FIXED_CATEGORIES.forEach(cat => {
+tasksByCategory[cat.id] = tasksByCategory[cat.id].filter(t => !t.done);
+});
+saveData();
+render();
+}
+
+function escapeHtml(text) {
+const div = document.createElement('div');
+div.textContent = text;
+return div.innerHTML;
+}
+
+function render() {
+cleanExpiredTasks();
+
+const containerEl = document.getElementById('categoryList');
+containerEl.innerHTML = FIXED_CATEGORIES.map(cat => {
+const tasks = tasksByCategory[cat.id];
+const tasksHtml = tasks.map((task, idx) => `
+<li class="task-card ${task.done ? 'done' : ''}" data-index="${idx}" data-cat="${cat.id}">
+<label class="task-left">
+<input type="checkbox" class="circle-checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask('${cat.id}', ${task.id})">
+<span class="task-text">${escapeHtml(task.text)}</span>
+</label>
+<div class="drag-handle" aria-label="순서 이동">
+<span></span>
+<span></span>
+<span></span>
+</div>
+</li>
+`).join('');
+
+return `
+<div class="section-block">
+<div class="section-header">
+<span class="section-title">${cat.name}</span>
+</div>
+<div class="add-task-box">
+<input type="text" id="taskInput-${cat.id}" placeholder="오늘 할 일 추가하기" onkeypress="if(event.key==='Enter') addTask('${cat.id}')">
+<button onclick="addTask('${cat.id}')">추가</button>
+</div>
+<ul class="task-list" id="list-${cat.id}">
+${tasksHtml}
+</ul>
+</div>
+`;
+}).join('');
+
+initDragAndDrop();
+}
+
+function initDragAndDrop() {
+const lists = document.querySelectorAll('.task-list');
+
+lists.forEach(list => {
+let draggedItem = null;
+
+list.querySelectorAll('.drag-handle').forEach(handle => {
+handle.addEventListener('pointerdown', (e) => {
+e.preventDefault();
+draggedItem = handle.closest('.task-card');
+draggedItem.classList.add('dragging');
+handle.setPointerCapture(e.pointerId);
+const onPointerMove = (moveEvent) => {
+if (!draggedItem) return;
+const siblings = [...list.querySelectorAll('.task-card:not(.dragging)')];
+const nextSibling = siblings.find(sibling => {
+const rect = sibling.getBoundingClientRect();
+return moveEvent.clientY < rect.top + rect.height / 2;
+});
+list.insertBefore(draggedItem, nextSibling || null);
+};
+
+const onPointerUp = () => {
+if (!draggedItem) return;
+draggedItem.classList.remove('dragging');
+handle.releasePointerCapture(e.pointerId);
+
+const catId = draggedItem.dataset.cat;
+const newOrderIndices = [...list.querySelectorAll('.task-card')].map(card => Number(card.dataset.index));
+tasksByCategory[catId] = newOrderIndices.map(i => tasksByCategory[catId][i]);
+
+saveData();
+draggedItem = null;
+handle.removeEventListener('pointermove', onPointerMove);
+handle.removeEventListener('pointerup', onPointerUp);
+render();
+};
+
+handle.addEventListener('pointermove', onPointerMove);
+handle.addEventListener('pointerup', onPointerUp);
+});
+});
+});
+}
+
+render();
+setInterval(render, 60000);
+</script>
+</body>
+</html>
